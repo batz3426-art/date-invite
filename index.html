@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Урилга ✨</title>
+    <title>Болзооны урилга ✨</title>
     <style>
         :root {
             --primary-color: #ff6b81;
@@ -50,8 +50,10 @@
         .btn-group {
             display: flex;
             justify-content: center;
+            align-items: center;
             gap: 15px;
             margin-top: 20px;
+            min-height: 80px;
             position: relative;
         }
 
@@ -62,26 +64,25 @@
             border: none;
             border-radius: 25px;
             cursor: pointer;
-            transition: transform 0.2s, background-color 0.2s;
+            transition: all 0.2s ease;
         }
 
         .btn-yes {
             background-color: var(--primary-color);
             color: white;
+            z-index: 10;
         }
 
         .btn-yes:hover {
             background-color: #ff4757;
-            transform: scale(1.05);
         }
 
         .btn-no {
             background-color: #eccc68;
             color: white;
-            position: relative;
+            position: absolute;
         }
 
-        /* Wheel Picker Styling */
         .picker-container {
             display: flex;
             justify-content: center;
@@ -101,14 +102,15 @@
             color: #747d8c;
         }
 
-        select {
+        select, input[type="text"] {
             padding: 10px 15px;
             font-size: 1em;
             border-radius: 12px;
-            border: 2px solid #ffa502;
+            border: 2px solid #ff788e;
             background-color: #fff;
             outline: none;
-            cursor: pointer;
+            width: 100%;
+            box-sizing: border-box;
         }
 
         .hidden {
@@ -117,6 +119,7 @@
 
         .spinner-container {
             margin: 20px 0;
+            position: relative;
         }
 
         .spinner {
@@ -128,22 +131,54 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            font-size: 1.2em;
+            font-size: 1.1em;
             font-weight: bold;
             color: var(--primary-color);
             background: conic-gradient(#ffeaa7 0deg 90deg, #fab1a0 90deg 180deg, #ffeaa7 180deg 270deg, #fab1a0 270deg 360deg);
-            transition: transform 3s cubic-bezier(0.25, 0.1, 0.25, 1);
+            transition: transform 2.5s cubic-bezier(0.25, 0.1, 0.25, 1);
+            padding: 10px;
+            box-sizing: border-box;
+        }
+
+        .radio-group {
+            text-align: left;
+            margin: 15px 0;
+        }
+
+        .radio-option {
+            background: #fff0f3;
+            padding: 12px 15px;
+            border-radius: 12px;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+            border: 2px solid transparent;
+        }
+
+        .radio-option:hover {
+            border-color: #ff788e;
+        }
+
+        .radio-option input {
+            margin-right: 12px;
+            accent-color: var(--primary-color);
+        }
+
+        .custom-input-box {
+            margin-top: 10px;
         }
     </style>
 </head>
 <body>
 
+    <!-- Step 1: Invitation -->
     <div class="container" id="step1">
         <h1>Болзоонд урьж байна! ✨</h1>
-        <p>10 сард хамтдаа гоё салхинд гарч, дуртай зүйлээ хийж цагийг өнгөрөөх үү? ☕🎬</p>
+        <p>10 сард хамтдаа дулаахан, гоё газар цагийг өнгөрөөх үү? ☕🎬</p>
         <div class="btn-group">
-            <button class="btn-yes" onclick="nextStep(2)">Тэгье! 💖</button>
-            <button class="btn-no" id="noBtn" onmouseover="moveButton()">Үгүй 😜</button>
+            <button class="btn-yes" id="yesBtn" onclick="nextStep(2)">Тэгье! 💖</button>
+            <button class="btn-no" id="noBtn" onmouseover="moveButton()" onclick="moveButton()">Үгүй 😜</button>
         </div>
     </div>
 
@@ -155,42 +190,52 @@
         <div class="picker-container">
             <div class="picker-col">
                 <label>Өдөр (10 сар)</label>
-                <select id="daySelect">
-                    <!-- Oct Days -->
-                </select>
+                <select id="daySelect"></select>
             </div>
             <div class="picker-col">
                 <label>Цаг</label>
-                <select id="timeSelect">
-                    <!-- Hours -->
-                </select>
+                <select id="timeSelect"></select>
             </div>
         </div>
 
         <button class="btn-yes" onclick="nextStep(3)">Дараах ➡️</button>
     </div>
 
-    <!-- Step 3: Activity Wheel -->
+    <!-- Step 3: Wheel Spin (3 times) -->
     <div class="container hidden" id="step3">
         <h1>Юу хийх вэ? 🎡</h1>
-        <p>Хүрд эргүүлж юу хийхээ шийдье!</p>
+        <p id="spinNotice">Хүрдийг 3 удаа эргүүлж сонголт цуглуулаарай! (Үлдсэн: <b id="spinsLeft">3</b>)</p>
         
         <div class="spinner-container">
             <div class="spinner" id="wheel">🎯 Эргүүлэх</div>
         </div>
 
         <button class="btn-yes" id="spinBtn" onclick="spinWheel()">Эргүүлэх 🎲</button>
-        <button class="btn-yes hidden" id="submitBtn" onclick="sendData()">Илгээх 💌</button>
     </div>
 
-    <!-- Step 4: Final Thank You -->
+    <!-- Step 4: Choose Best Option or Custom -->
     <div class="container hidden" id="step4">
+        <h1>Хамгийн таалагдсаныг нь сонгоорой! 💡</h1>
+        <p>Эргүүлж гарч ирсэн сонголтуудаас сонгох эсвэл өөрийн саналыг бичээрэй:</p>
+        
+        <div class="radio-group" id="optionsList"></div>
+
+        <div class="custom-input-box hidden" id="customBox">
+            <input type="text" id="customInput" placeholder="Өөрийн санаагаа бичээрэй...">
+        </div>
+
+        <br>
+        <button class="btn-yes" onclick="sendData()">Илгээж баталгаажуулах 💌</button>
+    </div>
+
+    <!-- Step 5: Final Thank You -->
+    <div class="container hidden" id="step5">
         <h1>Баярлалаа! 🎉</h1>
-        <p id="finalMsg">Амжилттай илгээгдлээ. Удахгүй уулзацгаая! ✨</p>
+        <p id="finalMsg">Урилгыг хүлээж авлаа. Удахгүй уулзацгаая! ✨</p>
     </div>
 
     <script>
-        // Populate Date and Time Options for Oct 2026
+        // Setup Date/Time Dropdowns
         const daySelect = document.getElementById('daySelect');
         for (let i = 1; i <= 31; i++) {
             let opt = document.createElement('option');
@@ -207,12 +252,20 @@
             timeSelect.appendChild(opt);
         }
 
-        // Runaway 'No' Button Logic
+        // Runaway 'No' Button & Growing 'Yes' Button
+        let yesScale = 1;
         function moveButton() {
             const btn = document.getElementById('noBtn');
-            const x = Math.random() * (window.innerWidth - 100) - window.innerWidth / 2;
-            const y = Math.random() * (window.innerHeight - 100) - window.innerHeight / 2;
+            const yesBtn = document.getElementById('yesBtn');
+            
+            // Move No button
+            const x = (Math.random() - 0.5) * 200;
+            const y = (Math.random() - 0.5) * 200;
             btn.style.transform = `translate(${x}px, ${y}px)`;
+
+            // Make Yes button bigger!
+            yesScale += 0.2;
+            yesBtn.style.transform = `scale(${yesScale})`;
         }
 
         // Navigation
@@ -221,51 +274,112 @@
             document.getElementById(`step${step}`).classList.remove('hidden');
         }
 
-        // Wheel Logic
-        const activities = ["Кино үзэх 🍿", "Кофены шопоор зочлох ☕", "Парк орох 🎡", "Агаар салхинд гарах 🌲"];
-        let selectedActivity = "";
+        // Indoor Activities List (Warm environment)
+        const activities = [
+            "Кино үзэх 🍿",
+            "Кофены шопоор зочлох ☕",
+            "Боулинг / Ракетолж тоглох 🎳",
+            "Арт мастеркласс / Зураг зурах 🎨",
+            "Гоё ресторанд оройн хоол идэх 🍝",
+            "Board games / Аркад тоглоом 🎲"
+        ];
+
+        let spinCount = 0;
+        let collectedOptions = [];
 
         function spinWheel() {
+            if (spinCount >= 3) return;
+
             const wheel = document.getElementById('wheel');
             const spinBtn = document.getElementById('spinBtn');
-            const submitBtn = document.getElementById('submitBtn');
+            const spinsLeftElem = document.getElementById('spinsLeft');
             
-            const randomDeg = 1440 + Math.floor(Math.random() * 360);
+            const randomDeg = 1080 + Math.floor(Math.random() * 360);
             wheel.style.transform = `rotate(${randomDeg}deg)`;
-            
             spinBtn.disabled = true;
-            
+
             setTimeout(() => {
-                selectedActivity = activities[Math.floor(Math.random() * activities.length)];
+                // Pick random unique option
+                let available = activities.filter(a => !collectedOptions.includes(a));
+                let picked = available[Math.floor(Math.random() * available.length)] || activities[0];
+                
+                collectedOptions.push(picked);
+                spinCount++;
+
                 wheel.style.transform = 'rotate(0deg)';
-                wheel.textContent = selectedActivity;
-                spinBtn.classList.add('hidden');
-                submitBtn.classList.remove('hidden');
-            }, 3000);
+                wheel.textContent = picked;
+                spinsLeftElem.textContent = 3 - spinCount;
+                spinBtn.disabled = false;
+
+                if (spinCount >= 3) {
+                    spinBtn.textContent = "Сонголтуудаа харах ➡️";
+                    spinBtn.onclick = function() { renderOptions(); nextStep(4); };
+                }
+            }, 2500);
         }
 
-        // Formspree Data Send
+        function renderOptions() {
+            const container = document.getElementById('optionsList');
+            container.innerHTML = '';
+
+            collectedOptions.forEach((opt, index) => {
+                container.innerHTML += `
+                    <label class="radio-option">
+                        <input type="radio" name="activityChoice" value="${opt}" ${index === 0 ? 'checked' : ''} onclick="toggleCustom(false)">
+                        <span>${opt}</span>
+                    </label>
+                `;
+            });
+
+            // Add Custom Option
+            container.innerHTML += `
+                <label class="radio-option">
+                    <input type="radio" name="activityChoice" value="custom" onclick="toggleCustom(true)">
+                    <span>Өөр зүйл хийе (Өөрөө бичих) ✍️</span>
+                </label>
+            `;
+        }
+
+        function toggleCustom(show) {
+            const customBox = document.getElementById('customBox');
+            if (show) {
+                customBox.classList.remove('hidden');
+            } else {
+                customBox.classList.add('hidden');
+            }
+        }
+
+        // Send Data to Formspree
         function sendData() {
             const day = document.getElementById('daySelect').value;
             const time = document.getElementById('timeSelect').value;
+            
+            const selectedRadio = document.querySelector('input[name="activityChoice"]:checked');
+            let finalActivity = selectedRadio ? selectedRadio.value : "";
+
+            if (finalActivity === 'custom') {
+                const customText = document.getElementById('customInput').value.trim();
+                finalActivity = customText !== "" ? `Өөрийн санал: ${customText}` : "Өөрийн санал бичээгүй";
+            }
 
             const formData = new FormData();
-            formData.append('Selected Date', day);
-            formData.append('Selected Time', time);
-            formData.append('Activity', selectedActivity);
+            formData.append('Сонгосон өдөр', day);
+            formData.append('Сонгосон цаг', time);
+            formData.append('Хийх зүйл', finalActivity);
 
-            // Replace endpoint if needed
             fetch('https://formspree.io/f/xbjnqpyz', {
                 method: 'POST',
                 body: formData,
-                headers: {
-                    'Accept': 'application/json'
-                }
-            }).then(response => {
-                document.getElementById('finalMsg').textContent = `Тохирсон өдөр: ${day}, ${time}\nХийх зүйл: ${selectedActivity}. Тэсэн ядан хүлээж байя! 💕`;
-                nextStep(4);
-            }).catch(error => {
-                nextStep(4);
+                headers: { 'Accept': 'application/json' }
+            }).then(() => {
+                document.getElementById('finalMsg').innerHTML = `
+                    <b>Сонгосон өдөр:</b> ${day}, ${time}<br>
+                    <b>Хийх зүйл:</b> ${finalActivity}<br><br>
+                    Тэсэн ядан хүлээж байя! 💕
+                `;
+                nextStep(5);
+            }).catch(() => {
+                nextStep(5);
             });
         }
     </script>
