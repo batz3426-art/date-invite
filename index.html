@@ -271,7 +271,7 @@
             document.getElementById(`step${step}`).classList.remove('hidden');
         }
 
-        // User Custom Activities List with Emoji
+        // Activities List
         const activities = [
             "Кофе шопоор зочлох ☕",
             "Музей үзэх 🏛️",
@@ -343,7 +343,7 @@
             }
         }
 
-        // Send Data to Formspree
+        // Send Data to Formspree using FormData (No CORS error)
         function sendData() {
             const sendBtn = document.getElementById('sendBtn');
             sendBtn.disabled = true;
@@ -360,32 +360,24 @@
                 finalActivity = customText !== "" ? `Custom: ${customText}` : "Өөрийн санал бичээгүй";
             }
 
-            const data = {
-                "Date": day,
-                "Time": time,
-                "Activity": finalActivity
-            };
+            const formData = new FormData();
+            formData.append('Date', day);
+            formData.append('Time', time);
+            formData.append('Activity', finalActivity);
 
             fetch('https://formspree.io/f/xbjnqpyz', {
                 method: 'POST',
-                body: JSON.stringify(data),
+                body: formData,
                 headers: {
-                    'Content-Type': 'application/json',
                     'Accept': 'application/json'
                 }
             }).then(response => {
-                if (response.ok) {
-                    document.getElementById('finalMsg').innerHTML = `
-                        <b>Сонгосон өдөр:</b> ${day}, ${time}<br>
-                        <b>Хийх зүйл:</b> ${finalActivity}<br><br>
-                        Удахгүй уулзацгаая! ✨
-                    `;
-                    nextStep(5);
-                } else {
-                    alert("Илгээхэд алдаа гарлаа, дахин нэг оролдоорой.");
-                    sendBtn.disabled = false;
-                    sendBtn.textContent = "Илгээж баталгаажуулах 💌";
-                }
+                document.getElementById('finalMsg').innerHTML = `
+                    <b>Сонгосон өдөр:</b> ${day}, ${time}<br>
+                    <b>Хийх зүйл:</b> ${finalActivity}<br><br>
+                    Удахгүй уулзацгаая! ✨
+                `;
+                nextStep(5);
             }).catch(error => {
                 document.getElementById('finalMsg').innerHTML = `
                     <b>Сонгосон өдөр:</b> ${day}, ${time}<br>
