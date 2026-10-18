@@ -343,7 +343,7 @@
             }
         }
 
-        // Send Data to Formspree using FormData (No CORS error)
+        // Send Data to Formspree using FormData with correct ID (mqpalgra)
         function sendData() {
             const sendBtn = document.getElementById('sendBtn');
             sendBtn.disabled = true;
@@ -365,7 +365,7 @@
             formData.append('Time', time);
             formData.append('Activity', finalActivity);
 
-            fetch('https://formspree.io/f/xbjnqpyz', {
+            fetch('https://formspree.io/f/mqpalgra', {
                 method: 'POST',
                 body: formData,
                 headers: {
