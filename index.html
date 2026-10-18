@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Болзооны урилга ✨</title>
+    <title>Урилга ✨</title>
     <style>
         :root {
             --primary-color: #ff6b81;
@@ -53,7 +53,7 @@
             align-items: center;
             gap: 15px;
             margin-top: 20px;
-            min-height: 80px;
+            height: 80px;
             position: relative;
         }
 
@@ -73,14 +73,11 @@
             z-index: 10;
         }
 
-        .btn-yes:hover {
-            background-color: #ff4757;
-        }
-
         .btn-no {
             background-color: #eccc68;
             color: white;
             position: absolute;
+            right: 80px;
         }
 
         .picker-container {
@@ -172,10 +169,10 @@
 </head>
 <body>
 
-    <!-- Step 1: Invitation -->
+    <!-- Step 1: Greeting -->
     <div class="container" id="step1">
-        <h1>Болзоонд урьж байна! ✨</h1>
-        <p>10 сард хамтдаа дулаахан, гоё газар цагийг өнгөрөөх үү? ☕🎬</p>
+        <h1>Цагийг зугаатай өнгөрөөцгөөе! ✨</h1>
+        <p>10 сард хамтдаа дулаахан, гоё газар цагийг хөгжилтэй өнгөрөөх үү? ☕🎬</p>
         <div class="btn-group">
             <button class="btn-yes" id="yesBtn" onclick="nextStep(2)">Тэгье! 💖</button>
             <button class="btn-no" id="noBtn" onmouseover="moveButton()" onclick="moveButton()">Үгүй 😜</button>
@@ -185,7 +182,7 @@
     <!-- Step 2: Date & Time Picker -->
     <div class="container hidden" id="step2">
         <h1>Өдөр болон цагаа сонгоорой 🗓️</h1>
-        <p>2026 оны 10 сарын тохиромжтой өдөр, цагаа сонгоно уу:</p>
+        <p>2026 оны 10 сарын боломжтой өдөр, цагаа сонгоорой:</p>
         
         <div class="picker-container">
             <div class="picker-col">
@@ -231,7 +228,7 @@
     <!-- Step 5: Final Thank You -->
     <div class="container hidden" id="step5">
         <h1>Баярлалаа! 🎉</h1>
-        <p id="finalMsg">Урилгыг хүлээж авлаа. Удахгүй уулзацгаая! ✨</p>
+        <p id="finalMsg">Амжилттай илгээгдлээ. Удахгүй уулзацгаая! ✨</p>
     </div>
 
     <script>
@@ -258,14 +255,14 @@
             const btn = document.getElementById('noBtn');
             const yesBtn = document.getElementById('yesBtn');
             
-            // Move No button
-            const x = (Math.random() - 0.5) * 200;
-            const y = (Math.random() - 0.5) * 200;
+            const x = (Math.random() - 0.5) * 100;
+            const y = (Math.random() - 0.5) * 50;
             btn.style.transform = `translate(${x}px, ${y}px)`;
 
-            // Make Yes button bigger!
-            yesScale += 0.2;
-            yesBtn.style.transform = `scale(${yesScale})`;
+            yesScale += 0.15;
+            if (yesScale < 1.8) {
+                yesBtn.style.transform = `scale(${yesScale})`;
+            }
         }
 
         // Navigation
@@ -299,7 +296,6 @@
             spinBtn.disabled = true;
 
             setTimeout(() => {
-                // Pick random unique option
                 let available = activities.filter(a => !collectedOptions.includes(a));
                 let picked = available[Math.floor(Math.random() * available.length)] || activities[0];
                 
@@ -331,7 +327,6 @@
                 `;
             });
 
-            // Add Custom Option
             container.innerHTML += `
                 <label class="radio-option">
                     <input type="radio" name="activityChoice" value="custom" onclick="toggleCustom(true)">
@@ -375,7 +370,7 @@
                 document.getElementById('finalMsg').innerHTML = `
                     <b>Сонгосон өдөр:</b> ${day}, ${time}<br>
                     <b>Хийх зүйл:</b> ${finalActivity}<br><br>
-                    Тэсэн ядан хүлээж байя! 💕
+                    Удахгүй уулзацгаая! ✨
                 `;
                 nextStep(5);
             }).catch(() => {
