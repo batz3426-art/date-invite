@@ -222,7 +222,7 @@
         </div>
 
         <br>
-        <button class="btn-yes" onclick="sendData()">Илгээж баталгаажуулах 💌</button>
+        <button class="btn-yes" id="sendBtn" onclick="sendData()">Илгээж баталгаажуулах 💌</button>
     </div>
 
     <!-- Step 5: Final Thank You -->
@@ -271,14 +271,13 @@
             document.getElementById(`step${step}`).classList.remove('hidden');
         }
 
-        // Indoor Activities List (Warm environment)
+        // User Custom Activities List with Emoji
         const activities = [
-            "Кино үзэх 🍿",
-            "Кофены шопоор зочлох ☕",
-            "Боулинг / Ракетолж тоглох 🎳",
-            "Арт мастеркласс / Зураг зурах 🎨",
-            "Гоё ресторанд оройн хоол идэх 🍝",
-            "Board games / Аркад тоглоом 🎲"
+            "Кофе шопоор зочлох ☕",
+            "Музей үзэх 🏛️",
+            "Canvas art 🎨",
+            "Амттай хоол идэх 🍽️",
+            "Сонирхолтой кино үзэх 🍿"
         ];
 
         let spinCount = 0;
@@ -346,6 +345,10 @@
 
         // Send Data to Formspree
         function sendData() {
+            const sendBtn = document.getElementById('sendBtn');
+            sendBtn.disabled = true;
+            sendBtn.textContent = "Илгээж байна...";
+
             const day = document.getElementById('daySelect').value;
             const time = document.getElementById('timeSelect').value;
             
@@ -354,26 +357,41 @@
 
             if (finalActivity === 'custom') {
                 const customText = document.getElementById('customInput').value.trim();
-                finalActivity = customText !== "" ? `Өөрийн санал: ${customText}` : "Өөрийн санал бичээгүй";
+                finalActivity = customText !== "" ? `Custom: ${customText}` : "Өөрийн санал бичээгүй";
             }
 
-            const formData = new FormData();
-            formData.append('Сонгосон өдөр', day);
-            formData.append('Сонгосон цаг', time);
-            formData.append('Хийх зүйл', finalActivity);
+            const data = {
+                "Date": day,
+                "Time": time,
+                "Activity": finalActivity
+            };
 
             fetch('https://formspree.io/f/xbjnqpyz', {
                 method: 'POST',
-                body: formData,
-                headers: { 'Accept': 'application/json' }
-            }).then(() => {
+                body: JSON.stringify(data),
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json'
+                }
+            }).then(response => {
+                if (response.ok) {
+                    document.getElementById('finalMsg').innerHTML = `
+                        <b>Сонгосон өдөр:</b> ${day}, ${time}<br>
+                        <b>Хийх зүйл:</b> ${finalActivity}<br><br>
+                        Удахгүй уулзацгаая! ✨
+                    `;
+                    nextStep(5);
+                } else {
+                    alert("Илгээхэд алдаа гарлаа, дахин нэг оролдоорой.");
+                    sendBtn.disabled = false;
+                    sendBtn.textContent = "Илгээж баталгаажуулах 💌";
+                }
+            }).catch(error => {
                 document.getElementById('finalMsg').innerHTML = `
                     <b>Сонгосон өдөр:</b> ${day}, ${time}<br>
                     <b>Хийх зүйл:</b> ${finalActivity}<br><br>
                     Удахгүй уулзацгаая! ✨
                 `;
-                nextStep(5);
-            }).catch(() => {
                 nextStep(5);
             });
         }
